@@ -11,6 +11,8 @@ import android.widget.Toast;
 
 public class Compass implements SensorEventListener
 {
+    // https://www.wlsdevelop.com/index.php/en/blog?option=com_content&view=article&id=38
+
     Context context;
     TextView output;
 

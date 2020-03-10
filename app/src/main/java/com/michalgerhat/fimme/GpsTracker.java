@@ -13,6 +13,8 @@ import androidx.core.content.ContextCompat;
 
 public class GpsTracker implements LocationListener
 {
+    // https://github.com/Shivakishore14/AndroidTutorial/tree/master/GPStut
+
     Context context;
 
     public GpsTracker(Context c)
