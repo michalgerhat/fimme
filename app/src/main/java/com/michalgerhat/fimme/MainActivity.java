@@ -14,15 +14,19 @@ import android.widget.TextView;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class MainActivity extends AppCompatActivity {
-
+public class MainActivity extends AppCompatActivity
+{
     Button btnLocation;
     TextView txtLocation;
+    TextView txtDirection;
     Timer t = new Timer();
     final Handler handler = new Handler();
 
+    final LocationObject churchStWenceslas = new LocationObject(50.073333, 14.404722, 0.0);
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -30,31 +34,39 @@ public class MainActivity extends AppCompatActivity {
 
         btnLocation = (Button)findViewById(R.id.btnLocation);
         txtLocation = (TextView)findViewById(R.id.txtLocation);
+        txtDirection = (TextView)findViewById(R.id.txtDirection);
 
-        btnLocation.setOnClickListener(new View.OnClickListener() {
-
+        btnLocation.setOnClickListener(new View.OnClickListener()
+        {
             @Override
-            public void onClick(View v) {
-                TimerTask refresh = new TimerTask() {
+            public void onClick(View v)
+            {
+                Compass compass = new Compass(getApplicationContext(), txtDirection);
+
+                TimerTask refresh = new TimerTask()
+                {
                     @Override
-                    public void run() {
-                        handler.post(new Runnable() {
+                    public void run()
+                    {
+                        handler.post(new Runnable()
+                        {
                             @Override
-                            public void run() {
+                            public void run()
+                            {
                                 GpsTracker g = new GpsTracker(getApplicationContext());
                                 Location l = g.getLocation();
-                                if (l != null) {
-                                    double lat = l.getLatitude();
-                                    double lon = l.getLongitude();
-                                    txtLocation.setText("LAT: " + lat + " LON: " + lon);
+                                if (l != null)
+                                {
+                                    LocationObject myLocation = new LocationObject(l);
+                                    int distance = (int)Math.round(myLocation.getDistance(churchStWenceslas));
+                                    txtLocation.setText("Distance from the Church of St. Wenceslas:\n" + distance + " meters");
                                 }
                             }
                         });
                     }
                 };
-
                 t.scheduleAtFixedRate(refresh, 0, 2000);
-           }
+            }
         });
     }
 }
