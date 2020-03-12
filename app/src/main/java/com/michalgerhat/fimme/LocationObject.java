@@ -4,12 +4,14 @@ import android.location.Location;
 
 public class LocationObject
 {
+    String displayName;
     double lat;
     double lon;
     double alt;
 
-    public LocationObject(double lat, double lon, double alt)
+    public LocationObject(String displayName, double lat, double lon, double alt)
     {
+        this.displayName = displayName;
         this.lat = lat;
         this.lon = lon;
         this.alt = alt;
@@ -17,6 +19,7 @@ public class LocationObject
 
     public LocationObject(Location l)
     {
+        this.displayName = "me";
         this.lat = l.getLatitude();
         this.lon = l.getLongitude();
         this.alt = l.getAltitude();
@@ -41,5 +44,18 @@ public class LocationObject
         double distance = Math.sqrt(Math.pow(R * c, 2) + Math.pow(other.alt - this.alt, 2));
 
         return distance;
+    }
+
+    public int getBearing(LocationObject other)
+    {
+        // https://www.igismap.com/formula-to-find-bearing-or-heading-angle-between-two-points-latitude-longitude/
+
+        double deltaLon = Math.abs(this.lon - other.lon);
+        double x = Math.cos(other.lat) * Math.sin(deltaLon);
+        double y = (Math.cos(this.lat) * Math.sin(other.lat)) - (Math.sin(this.lat) * Math.cos(other.lat) * Math.cos(deltaLon));
+        double bearingRad = Math.atan2(x, y);
+        int bearing = (int)Math.round(Math.toDegrees(bearingRad));
+
+        return bearing;
     }
 }

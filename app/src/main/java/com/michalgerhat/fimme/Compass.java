@@ -1,6 +1,5 @@
 package com.michalgerhat.fimme;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -14,9 +13,8 @@ public class Compass implements SensorEventListener
     // https://www.wlsdevelop.com/index.php/en/blog?option=com_content&view=article&id=38
 
     Context context;
-    TextView output;
-
-    public int azimuth;
+    TextView outputField;
+    private int azimuth;
     private SensorManager sm;
     private Sensor rotation, accelerometer, magnetometer;
     boolean haveSensor = false, haveSensor2 = false;
@@ -27,10 +25,11 @@ public class Compass implements SensorEventListener
     private boolean lastAccelerometerSet = false;
     private boolean lastMagnetometerSet = false;
 
-    public Compass(Context c, TextView out)
+    public Compass(Context context, TextView outputField)
     {
-        output = out;
-        context = c;
+        this.outputField = outputField;
+        this.context = context;
+
         sm = (SensorManager)context.getSystemService(Context.SENSOR_SERVICE);
 
         if (sm.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR) == null)
@@ -83,7 +82,7 @@ public class Compass implements SensorEventListener
         }
 
         azimuth = Math.round(azimuth);
-        output.setText("Direction: " + azimuth);
+        outputField.setText(azimuth + " degrees off North");
     }
 
     @Override

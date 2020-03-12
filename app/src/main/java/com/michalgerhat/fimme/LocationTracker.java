@@ -11,15 +11,15 @@ import android.widget.Toast;
 
 import androidx.core.content.ContextCompat;
 
-public class GpsTracker implements LocationListener
+public class LocationTracker implements LocationListener
 {
-    // https://github.com/Shivakishore14/AndroidTutorial/tree/master/GPStut
+     // https://github.com/Shivakishore14/AndroidTutorial/tree/master/GPStut
 
     Context context;
 
-    public GpsTracker(Context c)
+    public LocationTracker(Context context)
     {
-        context = c;
+        this.context = context;
     }
 
     public Location getLocation()
