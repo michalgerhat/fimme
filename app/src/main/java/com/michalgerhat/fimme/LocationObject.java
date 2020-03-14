@@ -25,7 +25,7 @@ public class LocationObject
         this.alt = l.getAltitude();
     }
 
-    public double getDistance(LocationObject other)
+    public int getDistance(LocationObject other)
     {
         // Haversine method
         // https://stackoverflow.com/questions/3694380/calculating-distance-between-two-points-using-latitude-longitude
@@ -41,9 +41,9 @@ public class LocationObject
 
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
-        double distance = Math.sqrt(Math.pow(R * c, 2) + Math.pow(other.alt - this.alt, 2));
+        double distance = Math.round(Math.sqrt(Math.pow(R * c, 2) + Math.pow(other.alt - this.alt, 2)));
 
-        return distance;
+        return (int)distance;
     }
 
     public int getBearing(LocationObject other)

@@ -4,22 +4,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
-import android.location.Location;
 import android.os.Bundle;
-import android.os.Handler;
 import android.widget.TextView;
-
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity
 {
     TextView txtDisplayName;
     TextView txtDistance;
     TextView txtDirection;
-    TextView txtBearing;
-    Timer t = new Timer();
-    final Handler handler = new Handler();
+    LocationObject myLocation;
 
     final LocationObject customLoc = new LocationObject("Church of Saint Wenceslas", 50.073333, 14.404722, 0.0);
 
@@ -34,38 +27,35 @@ public class MainActivity extends AppCompatActivity
         txtDisplayName = (TextView)findViewById(R.id.txtDisplayName);
         txtDistance = (TextView)findViewById(R.id.txtDistance);
         txtDirection = (TextView)findViewById(R.id.txtDirection);
-        txtBearing = (TextView)findViewById(R.id.txtBearing);
 
         txtDisplayName.setText(customLoc.displayName);
 
-        double bearing = 0.0;
-        Compass compass = new Compass(getApplicationContext(), txtDirection);
-
-        TimerTask refresh = new TimerTask()
+        Compass compass = new Compass(getApplicationContext());
+        compass.setListener(new Compass.CustomCompassListener()
         {
             @Override
-            public void run()
+            public void onSensorChanged(int azimuth)
             {
-                handler.post(new Runnable()
+                if (myLocation != null)
                 {
-                    @Override
-                    public void run()
-                    {
-                        LocationTracker g = new LocationTracker(getApplicationContext());
-                        Location l = g.getLocation();
-                        if (l != null)
-                        {
-                            LocationObject myLocation = new LocationObject(l);
-                            int distance = (int)Math.round(myLocation.getDistance(customLoc));
-                            txtDistance.setText(distance + " meters");
-
-                            double bearing = myLocation.getBearing(customLoc);
-                            txtBearing.setText(bearing + " degrees off the location");
-                        }
-                    }
-                });
+                    int bearing = myLocation.getBearing(customLoc);
+                    int direction = (360 - azimuth + bearing) % 360;
+                    txtDirection.setText("Direction: " + direction + " degrees");
+                }
             }
-        };
-        t.scheduleAtFixedRate(refresh, 0, 2000);
+        });
+
+        LocationTracker tracker = new LocationTracker(getApplicationContext());
+        tracker.setListener(new LocationTracker.CustomLocationListener()
+        {
+            @Override
+            public void onLocationChanged(LocationObject location)
+            {
+                myLocation = location;
+                int distance = myLocation.getDistance(customLoc);
+
+                txtDistance.setText("Distance: " + distance + " meters");
+            }
+        });
     }
 }

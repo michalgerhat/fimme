@@ -5,16 +5,19 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.widget.TextView;
 import android.widget.Toast;
+
 
 public class Compass implements SensorEventListener
 {
+    public interface CustomCompassListener
+    {
+        void onSensorChanged(int azimuth);
+    }
+
     // https://www.wlsdevelop.com/index.php/en/blog?option=com_content&view=article&id=38
 
     Context context;
-    TextView outputField;
-    private int azimuth;
     private SensorManager sm;
     private Sensor rotation, accelerometer, magnetometer;
     boolean haveSensor = false, haveSensor2 = false;
@@ -25,10 +28,17 @@ public class Compass implements SensorEventListener
     private boolean lastAccelerometerSet = false;
     private boolean lastMagnetometerSet = false;
 
-    public Compass(Context context, TextView outputField)
+    private CustomCompassListener listener;
+
+    public void setListener(CustomCompassListener listener)
     {
-        this.outputField = outputField;
+        this.listener = listener;
+    }
+
+    public Compass(Context context)
+    {
         this.context = context;
+        this.listener = null;
 
         sm = (SensorManager)context.getSystemService(Context.SENSOR_SERVICE);
 
@@ -37,7 +47,7 @@ public class Compass implements SensorEventListener
             if ((sm.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) == null)
                     || (sm.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD) == null))
             {
-                Toast.makeText(context, "No sensors", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "There are no sensors available.", Toast.LENGTH_SHORT).show();
             }
             else
             {
@@ -57,6 +67,8 @@ public class Compass implements SensorEventListener
     @Override
     public void onSensorChanged(SensorEvent event)
     {
+        int azimuth = 0;
+
         if (event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR)
         {
             SensorManager.getRotationMatrixFromVector(rMat, event.values);
@@ -81,8 +93,7 @@ public class Compass implements SensorEventListener
             azimuth = (int)(Math.toDegrees(SensorManager.getOrientation(rMat, orientation)[0]) + 360) % 360;
         }
 
-        azimuth = Math.round(azimuth);
-        outputField.setText(azimuth + " degrees off North");
+        listener.onSensorChanged(azimuth);
     }
 
     @Override

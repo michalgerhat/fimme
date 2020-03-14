@@ -18,33 +18,20 @@
         android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txtBearing" />
+        app:layout_constraintTop_toBottomOf="@+id/txtDirection" />
 
     <TextView
         android:id="@+id/txtDirection"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="sans-serif-thin"
-        android:text="no compass"
+        android:text="no direction"
         android:textColor="?android:attr/textColorPrimary"
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/txtDisplayName" />
-
-    <TextView
-        android:id="@+id/txtBearing"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:fontFamily="sans-serif-thin"
-        android:text="no bearing"
-        android:textColor="?android:attr/textColorPrimary"
-        android:textSize="18sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.501"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txtDirection" />
 
     <TextView
         android:id="@+id/lblTracking"
