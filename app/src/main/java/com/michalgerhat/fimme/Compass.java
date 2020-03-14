@@ -10,6 +10,8 @@ import android.widget.Toast;
 
 public class Compass implements SensorEventListener
 {
+    // https://gist.github.com/nesquena/8265f057fef203a2c67e
+
     public interface CustomCompassListener
     {
         void onSensorChanged(int azimuth);

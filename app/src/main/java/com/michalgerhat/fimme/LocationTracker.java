@@ -13,6 +13,8 @@ import androidx.core.content.ContextCompat;
 
 public class LocationTracker implements LocationListener
 {
+    // https://gist.github.com/nesquena/8265f057fef203a2c67e
+
     public interface CustomLocationListener
     {
         void onLocationChanged(LocationObject location);
@@ -42,7 +44,14 @@ public class LocationTracker implements LocationListener
                 == PackageManager.PERMISSION_DENIED ||
              ContextCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_DENIED)
-            Toast.makeText(context, denied, Toast.LENGTH_SHORT).show();
+        {
+            Toast.makeText(context, denied, Toast.LENGTH_LONG).show();
+        }
+        else if (!lm.isProviderEnabled(LocationManager.GPS_PROVIDER) &&
+                !lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER))
+        {
+            Toast.makeText(context, disabled, Toast.LENGTH_SHORT).show();
+        } 
         else
         {
             Criteria criteria = new Criteria();
@@ -50,11 +59,6 @@ public class LocationTracker implements LocationListener
             criteria.setPowerRequirement(Criteria.POWER_HIGH);
             String provider = lm.getBestProvider(criteria, true);
             lm.requestLocationUpdates(provider, 2000, 2, this);
-        }
-        if (!lm.isProviderEnabled(LocationManager.GPS_PROVIDER) &&
-            !lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER))
-        {
-            Toast.makeText(context, disabled, Toast.LENGTH_SHORT).show();
         }
     }
 
