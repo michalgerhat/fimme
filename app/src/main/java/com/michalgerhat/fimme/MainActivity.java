@@ -4,16 +4,21 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
+import android.media.Image;
 import android.os.Bundle;
+import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.RotateAnimation;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity
 {
     TextView txtDisplayName;
     TextView txtDistance;
-    TextView txtDirection;
+    ImageView svgArrow;
+    int currentDirection = 0;
     LocationObject myLocation;
-
     final LocationObject customLoc = new LocationObject("Church of Saint Wenceslas", 50.073333, 14.404722, 0.0);
 
     @Override
@@ -26,7 +31,7 @@ public class MainActivity extends AppCompatActivity
 
         txtDisplayName = (TextView)findViewById(R.id.txtDisplayName);
         txtDistance = (TextView)findViewById(R.id.txtDistance);
-        txtDirection = (TextView)findViewById(R.id.txtDirection);
+        svgArrow = (ImageView)findViewById(R.id.svgArrow);
 
         txtDisplayName.setText(customLoc.displayName);
 
@@ -40,7 +45,17 @@ public class MainActivity extends AppCompatActivity
                 {
                     int bearing = myLocation.getBearing(customLoc);
                     int direction = (360 - azimuth + bearing) % 360;
-                    txtDirection.setText("Direction: " + direction + " degrees");
+
+                    // https://www.javacodegeeks.com/2013/09/android-compass-code-example.html
+
+                    RotateAnimation pointArrow = new RotateAnimation(
+                            currentDirection, direction,
+                            Animation.RELATIVE_TO_SELF, 0.5f,
+                            Animation.RELATIVE_TO_SELF, 0.5f);
+                    pointArrow.setDuration(200);
+                    pointArrow.setFillAfter(true);
+                    svgArrow.startAnimation(pointArrow);
+                    currentDirection = direction;
                 }
             }
         });
@@ -54,7 +69,7 @@ public class MainActivity extends AppCompatActivity
                 myLocation = location;
                 int distance = myLocation.getDistance(customLoc);
 
-                txtDistance.setText("Distance: " + distance + " meters");
+                txtDistance.setText(distance + " m");
             }
         });
     }

@@ -51,7 +51,7 @@ public class LocationTracker implements LocationListener
                 !lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER))
         {
             Toast.makeText(context, disabled, Toast.LENGTH_SHORT).show();
-        } 
+        }
         else
         {
             Criteria criteria = new Criteria();
