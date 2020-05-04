@@ -7,7 +7,6 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.widget.Toast;
 
-
 public class Compass implements SensorEventListener
 {
     // https://gist.github.com/nesquena/8265f057fef203a2c67e
@@ -19,12 +18,8 @@ public class Compass implements SensorEventListener
 
     // https://www.wlsdevelop.com/index.php/en/blog?option=com_content&view=article&id=38
 
-    Context context;
-    private SensorManager sm;
-    private Sensor rotation, accelerometer, magnetometer;
-    boolean haveSensor = false, haveSensor2 = false;
-    float[] rMat = new float[9];
-    float[] orientation = new float[3];
+    private float[] rMat = new float[9];
+    private float[] orientation = new float[3];
     private float[] lastAccelerometer = new float[3];
     private float[] lastMagnetometer = new float[3];
     private boolean lastAccelerometerSet = false;
@@ -32,17 +27,19 @@ public class Compass implements SensorEventListener
 
     private CustomCompassListener listener;
 
-    public void setListener(CustomCompassListener listener)
+    void setListener(CustomCompassListener listener)
     {
         this.listener = listener;
     }
 
-    public Compass(Context context)
+    Compass(Context context)
     {
-        this.context = context;
-        this.listener = null;
+        this.listener = new CustomCompassListener() {
+            @Override
+            public void onSensorChanged(int azimuth) {}
+        };
 
-        sm = (SensorManager)context.getSystemService(Context.SENSOR_SERVICE);
+        SensorManager sm = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
 
         if (sm.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR) == null)
         {
@@ -53,16 +50,16 @@ public class Compass implements SensorEventListener
             }
             else
             {
-                accelerometer = sm.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-                magnetometer = sm.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
-                haveSensor = sm.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_UI);
-                haveSensor2 = sm.registerListener(this, magnetometer, SensorManager.SENSOR_DELAY_UI);
+                Sensor accelerometer = sm.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+                Sensor magnetometer = sm.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+                sm.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_UI);
+                sm.registerListener(this, magnetometer, SensorManager.SENSOR_DELAY_UI);
             }
         }
         else
         {
-            rotation = sm.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
-            haveSensor = sm.registerListener(this, rotation, SensorManager.SENSOR_DELAY_UI);
+            Sensor rotation = sm.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
+            sm.registerListener(this, rotation, SensorManager.SENSOR_DELAY_UI);
         }
     }
 

@@ -2,40 +2,102 @@ package com.michalgerhat.fimme;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-
 import android.Manifest;
-import android.media.Image;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
-import android.view.WindowManager;
+import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
 import android.widget.TextView;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class MainActivity extends AppCompatActivity
 {
-    TextView txtDisplayName;
-    TextView txtDistance;
-    ImageView svgArrow;
-    int currentDirection = 0;
-    LocationObject myLocation;
-    final LocationObject customLoc = new LocationObject("Church of Saint Wenceslas", 50.073333, 14.404722, 0.0);
+    private int SELECT_PLACE = 1;
+
+    private int currentDirection = 0;
+    private int distance = 0;
+    private LocationObject myLocation;
+    private LocationTracker tracker;
+    private Compass compass;
+
+    private FloatingActionButton fabExplore;
+    private TextView lblStatus;
+    private TextView txtDisplayName;
+    private TextView txtDistance;
+    private ImageView svgArrow;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Context context = getApplicationContext();
 
         ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 123);
 
-        txtDisplayName = (TextView)findViewById(R.id.txtDisplayName);
-        txtDistance = (TextView)findViewById(R.id.txtDistance);
-        svgArrow = (ImageView)findViewById(R.id.svgArrow);
+        lblStatus = findViewById(R.id.lblStatus);
+        txtDisplayName = findViewById(R.id.txtDisplayName);
+        txtDistance = findViewById(R.id.txtDistance);
+        svgArrow = findViewById(R.id.svgArrow);
+        fabExplore = findViewById(R.id.fabExplore);
 
-        txtDisplayName.setText(customLoc.displayName);
+        lblStatus.setText("Getting your location...");
+        txtDisplayName.setText("");
+        fabExplore.setEnabled(false);
 
-        Compass compass = new Compass(getApplicationContext());
+        compass = new Compass(context);
+        tracker = new LocationTracker(context);
+        tracker.setListener(new LocationTracker.CustomLocationListener()
+        {
+            @Override
+            public void onLocationChanged(LocationObject location)
+            {
+                if (myLocation == null)
+                {
+                    lblStatus.setText("Ready to track");
+                    fabExplore.setEnabled(true);
+                    fabExplore.show();
+
+                    fabExplore.setOnClickListener(new View.OnClickListener()
+                    {
+                        @Override
+                        public void onClick(View v)
+                        {
+                            Intent intent = new Intent(MainActivity.this, PlacesActivity.class);
+                            Bundle locationBundle = new Bundle();
+                            locationBundle.putSerializable("MY_LOCATION", myLocation);
+                            intent.putExtras(locationBundle);
+                            startActivityForResult(intent, SELECT_PLACE);
+                        }
+                    });
+                }
+                myLocation = location;
+            }
+        });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == SELECT_PLACE && resultCode == RESULT_OK)
+        {
+            Bundle locationBundle = data.getExtras();
+            LocationObject target = (LocationObject)locationBundle.getSerializable("TARGET_LOCATION");
+            setTargetLocation(target);
+        }
+    }
+
+    public void setTargetLocation(final LocationObject target)
+    {
+        lblStatus.setText("Tracking");
+        txtDisplayName.setText(target.displayName);
+        distance = myLocation.getDistance(target);
+        txtDistance.setText(distance + " m");
+
         compass.setListener(new Compass.CustomCompassListener()
         {
             @Override
@@ -43,7 +105,7 @@ public class MainActivity extends AppCompatActivity
             {
                 if (myLocation != null)
                 {
-                    int bearing = myLocation.getBearing(customLoc);
+                    int bearing = myLocation.getBearing(target);
                     int direction = (360 - azimuth + bearing) % 360;
 
                     // https://www.javacodegeeks.com/2013/09/android-compass-code-example.html
@@ -60,15 +122,13 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        LocationTracker tracker = new LocationTracker(getApplicationContext());
         tracker.setListener(new LocationTracker.CustomLocationListener()
         {
             @Override
             public void onLocationChanged(LocationObject location)
             {
                 myLocation = location;
-                int distance = myLocation.getDistance(customLoc);
-
+                distance = myLocation.getDistance(target);
                 txtDistance.setText(distance + " m");
             }
         });

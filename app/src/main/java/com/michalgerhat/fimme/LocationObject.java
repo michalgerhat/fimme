@@ -1,15 +1,18 @@
 package com.michalgerhat.fimme;
 
 import android.location.Location;
+import java.io.Serializable;
 
-public class LocationObject
+public class LocationObject implements Serializable
 {
+    private static final long serialVersionUID = 1337;
+
     String displayName;
     double lat;
     double lon;
     double alt;
 
-    public LocationObject(String displayName, double lat, double lon, double alt)
+    LocationObject(String displayName, double lat, double lon, double alt)
     {
         this.displayName = displayName;
         this.lat = lat;
@@ -17,7 +20,7 @@ public class LocationObject
         this.alt = alt;
     }
 
-    public LocationObject(Location l)
+    LocationObject(Location l)
     {
         this.displayName = "me";
         this.lat = l.getLatitude();
@@ -25,7 +28,7 @@ public class LocationObject
         this.alt = l.getAltitude();
     }
 
-    public int getDistance(LocationObject other)
+    int getDistance(LocationObject other)
     {
         // Haversine method
         // https://stackoverflow.com/questions/3694380/calculating-distance-between-two-points-using-latitude-longitude
@@ -46,7 +49,7 @@ public class LocationObject
         return (int)distance;
     }
 
-    public int getBearing(LocationObject other)
+    int getBearing(LocationObject other)
     {
         // https://www.igismap.com/formula-to-find-bearing-or-heading-angle-between-two-points-latitude-longitude/
 
@@ -55,7 +58,12 @@ public class LocationObject
         double y = (Math.cos(this.lat) * Math.sin(other.lat)) - (Math.sin(this.lat) * Math.cos(other.lat) * Math.cos(deltaLon));
         double bearingRad = Math.atan2(x, y);
         int bearing = (int)Math.round(Math.toDegrees(bearingRad));
-
         return bearing;
+    }
+
+    @Override
+    public String toString()
+    {
+        return this.displayName;
     }
 }

@@ -8,7 +8,6 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.widget.Toast;
-
 import androidx.core.content.ContextCompat;
 
 public class LocationTracker implements LocationListener
@@ -20,36 +19,36 @@ public class LocationTracker implements LocationListener
         void onLocationChanged(LocationObject location);
     }
 
-     // https://www.thecodecity.com/2017/03/location-tracker-android-app-complete.html
+    // https://www.thecodecity.com/2017/03/location-tracker-android-app-complete.html
 
-    Context context;
-    CustomLocationListener listener;
-    LocationManager lm;
-    final String denied = "Location permission denied. Please allow Fimme to access location services.";
-    final String disabled = "Location disabled. Please enable location services.";
+    private CustomLocationListener listener;
 
-    public void setListener(CustomLocationListener listener)
+    void setListener(CustomLocationListener listener)
     {
         this.listener = listener;
     }
 
-    public LocationTracker(Context context)
+    LocationTracker(Context context)
     {
-        this.context = context;
-        this.listener = null;
+        this.listener = new CustomLocationListener() {
+            @Override
+            public void onLocationChanged(LocationObject location) {}
+        };
 
-        lm = (LocationManager)context.getSystemService(Context.LOCATION_SERVICE);
+        LocationManager lm = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
 
         if (ContextCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_COARSE_LOCATION)
                 == PackageManager.PERMISSION_DENIED ||
              ContextCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_DENIED)
         {
+            String denied = "Location permission denied. Please allow Fimme to access location services.";
             Toast.makeText(context, denied, Toast.LENGTH_LONG).show();
         }
         else if (!lm.isProviderEnabled(LocationManager.GPS_PROVIDER) &&
                 !lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER))
         {
+            String disabled = "Location disabled. Please enable location services.";
             Toast.makeText(context, disabled, Toast.LENGTH_SHORT).show();
         }
         else

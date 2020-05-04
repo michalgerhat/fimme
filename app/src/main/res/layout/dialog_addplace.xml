@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <EditText
+        android:id="@+id/txtPlaceName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Place name"
+        android:inputType="text"
+        android:layout_margin="8dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true" />
+
+    <TextView
+        android:id="@+id/lblLatitude"
+        android:text="Lat:"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/txtPlaceLon"
+        android:layout_below="@+id/txtPlaceName"
+        android:gravity="center_vertical"
+        android:layout_alignParentLeft="true"
+        android:layout_margin="8dp" />
+
+    <EditText
+        android:id="@+id/txtPlaceLat"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Latitude"
+        android:inputType="numberDecimal"
+        android:layout_margin="8dp"
+        android:layout_toRightOf="@+id/lblLongitude"
+        android:layout_below="@id/txtPlaceName" />
+
+    <TextView
+        android:id="@+id/lblLongitude"
+        android:text="Lon:"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/txtPlaceAlt"
+        android:layout_below="@+id/txtPlaceLat"
+        android:gravity="center_vertical"
+        android:layout_alignParentLeft="true"
+        android:layout_margin="8dp" />
+
+    <EditText
+        android:id="@+id/txtPlaceLon"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Longitude"
+        android:inputType="numberDecimal"
+        android:layout_margin="8dp"
+        android:layout_toRightOf="@+id/lblLongitude"
+        android:layout_below="@id/txtPlaceLat" />
+
+    <TextView
+        android:id="@+id/lblAltitude"
+        android:text="Alt:"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/spaceBottom"
+        android:layout_below="@+id/txtPlaceLon"
+        android:gravity="center_vertical"
+        android:layout_alignParentLeft="true"
+        android:layout_margin="8dp" />
+
+    <EditText
+        android:id="@+id/txtPlaceAlt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Altitude"
+        android:inputType="numberDecimal"
+        android:layout_margin="8dp"
+        android:layout_toRightOf="@+id/lblLongitude"
+        android:layout_below="@id/txtPlaceLon" />
+
+    <Space
+        android:id="@+id/spaceBottom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/txtPlaceAlt" />
+
+</RelativeLayout>
