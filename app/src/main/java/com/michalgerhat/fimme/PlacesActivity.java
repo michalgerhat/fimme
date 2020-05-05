@@ -13,15 +13,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import java.util.ArrayList;
 import java.util.Locale;
 
 public class PlacesActivity extends AppCompatActivity
 {
-    ListView listPlaces;
-    FloatingActionButton fabAddPlace;
-    ArrayList<LocationObject> places;
-    LocationObject myLocation;
+    private PlacesManager placesManager;
+    private LocationObject myLocation;
+    private ListView listPlaces;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -31,26 +29,22 @@ public class PlacesActivity extends AppCompatActivity
 
         Intent intent = this.getIntent();
         Bundle locationBundle = intent.getExtras();
-        myLocation = (LocationObject)locationBundle.getSerializable("MY_LOCATION");
+        myLocation = (LocationObject) locationBundle.getSerializable("MY_LOCATION");
+
+        placesManager = new PlacesManager(this);
 
         listPlaces = findViewById(R.id.listPlaces);
-        fabAddPlace = findViewById(R.id.fabAddPlace);
-
-        places = new ArrayList<>();
-        places.add(new LocationObject("Kuželkárna", 50.04760943, 14.32975531, 370.0));
-        places.add(new LocationObject("Kostel sv. Václava", 50.073333, 14.404722, 300.0));
+        FloatingActionButton fabAddPlace = findViewById(R.id.fabAddPlace);
 
         ArrayAdapter<LocationObject> arrayAdapter = new ArrayAdapter<>(
-                this, android.R.layout.simple_list_item_1, places
+                this, android.R.layout.simple_list_item_1, placesManager.placesArray
         );
 
         listPlaces.setAdapter(arrayAdapter);
-        listPlaces.setOnItemClickListener(new AdapterView.OnItemClickListener()
-        {
+        listPlaces.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
-            {
-                LocationObject target = (LocationObject)listPlaces.getAdapter().getItem(position);
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                LocationObject target = (LocationObject) listPlaces.getAdapter().getItem(position);
                 Intent returnIntent = new Intent(listPlaces.getContext(), MainActivity.class);
                 Bundle locationBundle = new Bundle();
                 locationBundle.putSerializable("TARGET_LOCATION", target);
@@ -60,11 +54,9 @@ public class PlacesActivity extends AppCompatActivity
             }
         });
 
-        fabAddPlace.setOnClickListener(new View.OnClickListener()
-        {
+        fabAddPlace.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v)
-            {
+            public void onClick(View v) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(PlacesActivity.this);
                 LayoutInflater inflater = getLayoutInflater();
                 View dialogView = inflater.inflate(R.layout.dialog_addplace, null);
@@ -91,12 +83,11 @@ public class PlacesActivity extends AppCompatActivity
                         String lonString = txtPlaceLon.getText().toString();
                         String altString = txtPlaceAlt.getText().toString();
 
-                        if (name.length() != 0 && latString.length() != 0 && lonString.length() != 0 && altString.length() != 0)
-                        {
+                        if (name.length() != 0 && latString.length() != 0 && lonString.length() != 0 && altString.length() != 0) {
                             double lat = Double.parseDouble(latString);
                             double lon = Double.parseDouble(lonString);
                             double alt = Double.parseDouble(altString);
-                            places.add(new LocationObject(name, lat, lon, alt));
+                            placesManager.addPlace(new LocationObject(name, lat, lon, alt));
                             dialog.dismiss();
                         }
                     }
@@ -105,8 +96,7 @@ public class PlacesActivity extends AppCompatActivity
                 Button neutralButton = dialog.getButton(AlertDialog.BUTTON_NEUTRAL);
                 neutralButton.setOnClickListener(new View.OnClickListener() {
                     @Override
-                    public void onClick(View v)
-                    {
+                    public void onClick(View v) {
                         txtPlaceLat.setText(String.format(Locale.US, "%.8f", myLocation.lat));
                         txtPlaceLon.setText(String.format(Locale.US, "%.8f", myLocation.lon));
                         txtPlaceAlt.setText(String.format(Locale.US, "%.8f", myLocation.alt));
