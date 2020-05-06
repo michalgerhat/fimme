@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -36,11 +35,18 @@ public class PlacesActivity extends AppCompatActivity
         listPlaces = findViewById(R.id.listPlaces);
         FloatingActionButton fabAddPlace = findViewById(R.id.fabAddPlace);
 
-        ArrayAdapter<LocationObject> arrayAdapter = new ArrayAdapter<>(
-                this, android.R.layout.simple_list_item_1, placesManager.placesArray
-        );
-
-        listPlaces.setAdapter(arrayAdapter);
+        final PlacesAdapter adapter = new PlacesAdapter(this, placesManager.placesArray);
+        adapter.setDeleteButtonListener(new PlacesAdapter.IDeleteButtonListener()
+        {
+            @Override
+            public void OnButtonClickListener(int position, LocationObject place)
+            {
+                placesManager.removePlace(place);
+                adapter.notifyDataSetChanged();
+            }
+        });
+        listPlaces.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
         listPlaces.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {

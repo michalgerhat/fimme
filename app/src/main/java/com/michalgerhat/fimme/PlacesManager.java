@@ -9,6 +9,7 @@ import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 class PlacesManager
 {
@@ -123,6 +124,18 @@ class PlacesManager
     void addPlace(LocationObject place)
     {
         placesArray.add(place);
+        savePlaces();
+    }
+
+    void removePlace(LocationObject place)
+    {
+        Iterator<LocationObject> it = placesArray.iterator();
+        while (it.hasNext())
+        {
+            LocationObject nextPlace = it.next();
+            if (place.equals(nextPlace))
+                it.remove();
+        }
         savePlaces();
     }
 }

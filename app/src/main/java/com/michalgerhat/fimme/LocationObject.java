@@ -57,8 +57,7 @@ public class LocationObject implements Serializable
         double x = Math.cos(other.lat) * Math.sin(deltaLon);
         double y = (Math.cos(this.lat) * Math.sin(other.lat)) - (Math.sin(this.lat) * Math.cos(other.lat) * Math.cos(deltaLon));
         double bearingRad = Math.atan2(x, y);
-        int bearing = (int)Math.round(Math.toDegrees(bearingRad));
-        return bearing;
+        return (int)Math.round(Math.toDegrees(bearingRad));
     }
 
     @Override
