@@ -12,6 +12,6 @@ Fimme is meant to provide navigation in the most simplified way, displaying just
 
 ## Todo - online functionality
 
-* WebSocket communication module implementing protocol of [fimme-server](https://github.com/michalgerhat/fimme-server/wiki).
+* WebSocket communication module implementing protocol of [fimme-server](https://github.com/michalgerhat/fimme-server).
 * GUI to support everything - login, friends list, friend requests, connection.
 * Saving login info using AccountManager.
