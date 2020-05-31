@@ -19,6 +19,7 @@ public class MainActivity extends AppCompatActivity
 
     private int currentDirection = 0;
     private int distance = 0;
+    private SocketManager socket;
     private LocationObject myLocation;
     private LocationTracker tracker;
     private Compass compass;
@@ -77,6 +78,8 @@ public class MainActivity extends AppCompatActivity
                 myLocation = location;
             }
         });
+
+        socket = new SocketManager(context);
     }
 
     @Override
