@@ -30,7 +30,8 @@ public class LocationTracker implements LocationListener
 
     LocationTracker(Context context)
     {
-        this.listener = new CustomLocationListener() {
+        this.listener = new CustomLocationListener()
+        {
             @Override
             public void onLocationChanged(LocationObject location) {}
         };

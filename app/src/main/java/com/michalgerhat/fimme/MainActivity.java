@@ -3,24 +3,56 @@ package com.michalgerhat.fimme;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import android.Manifest;
+import android.accounts.AccountManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-public class MainActivity extends AppCompatActivity
-{
-    private int SELECT_PLACE = 1;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+public class MainActivity extends AppCompatActivity implements MainActivityContext
+{
+    FimmeService fimme;
+    boolean bound = false;
+
+    private ServiceConnection serviceConnection = new ServiceConnection()
+    {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service)
+        {
+            FimmeService.LocalBinder binder = (FimmeService.LocalBinder)service;
+            fimme = binder.getService();
+            bound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name)
+        {
+            bound = false;
+        }
+    };
+
+    private static final int LOGIN = 1;
+    private static final int SELECT_PLACE = 2;
+
+    private LocationObject myLocation;
     private int currentDirection = 0;
     private int distance = 0;
-    private SocketManager socket;
-    private LocationObject myLocation;
+
+    private Context context;
+
     private LocationTracker tracker;
     private Compass compass;
 
@@ -35,9 +67,13 @@ public class MainActivity extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Context context = getApplicationContext();
+        this.context = getApplicationContext();
 
-        ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 123);
+        Intent serviceIntent = new Intent(this, FimmeService.class);
+        bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE);
+
+        ActivityCompat.requestPermissions(MainActivity.this,
+                new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 123);
 
         lblStatus = findViewById(R.id.lblStatus);
         txtDisplayName = findViewById(R.id.txtDisplayName);
@@ -49,8 +85,9 @@ public class MainActivity extends AppCompatActivity
         txtDisplayName.setText("");
         fabExplore.setEnabled(false);
 
-        compass = new Compass(context);
-        tracker = new LocationTracker(context);
+        this.compass = new Compass(context);
+        this.tracker = new LocationTracker(context);
+
         tracker.setListener(new LocationTracker.CustomLocationListener()
         {
             @Override
@@ -78,19 +115,34 @@ public class MainActivity extends AppCompatActivity
                 myLocation = location;
             }
         });
-
-        socket = new SocketManager(context);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
     {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == SELECT_PLACE && resultCode == RESULT_OK)
+        if (resultCode != RESULT_OK) return;
+        switch (requestCode)
         {
-            Bundle locationBundle = data.getExtras();
-            LocationObject target = (LocationObject)locationBundle.getSerializable("TARGET_LOCATION");
-            setTargetLocation(target);
+            case LOGIN:
+                try
+                {
+                    JSONObject credentials = new JSONObject();
+                    credentials.put("username", data.getStringExtra("username"));
+                    credentials.put("password", data.getStringExtra("password"));
+                    socket.sendMessage("request-login", credentials);
+                }
+                catch (JSONException e)
+                {
+                    e.printStackTrace();
+                }
+                break;
+
+            case SELECT_PLACE:
+                Bundle locationBundle = data.getExtras();
+                LocationObject target = (LocationObject)locationBundle.getSerializable("TARGET_LOCATION");
+                setTargetLocation(target);
+                break;
         }
     }
 
@@ -135,5 +187,23 @@ public class MainActivity extends AppCompatActivity
                 txtDistance.setText(distance + " m");
             }
         });
+    }
+
+    public void toast(final String message)
+    {
+        runOnUiThread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    @Override
+    public SocketManager getSocketManager()
+    {
+        return socket;
     }
 }
