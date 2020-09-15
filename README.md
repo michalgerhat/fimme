@@ -8,7 +8,8 @@ Fimme is meant to provide navigation in the most simplified way, displaying just
 * Using the device's motion sensors as compass along with coordinates provided by location services, Fimme will point in the direction of the selected place.
 * User can add his own places - either fill out the GPS coordinates or use their device's current GPS coordinates.
 * Places are saved to and loaded from a JSON file on the device's internal storage.
-* Places ListView is using a custom Adapter, allowing for deleting saved places.
+* Places can be shared via a link and saved upon clicking the link.
+* Places ListView is using a custom Adapter, allowing for deleting and sharing saved places.
 
 ## Todo - online functionality
 
