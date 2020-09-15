@@ -1,10 +1,14 @@
 package com.michalgerhat.fimme;
 
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.View;
 import android.view.animation.Animation;
@@ -15,8 +19,9 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class MainActivity extends AppCompatActivity
 {
-    private int SELECT_PLACE = 1;
+    private Context context;
 
+    private int SELECT_PLACE = 1;
     private int currentDirection = 0;
     private int distance = 0;
     private LocationObject myLocation;
@@ -34,20 +39,36 @@ public class MainActivity extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Context context = getApplicationContext();
-
-        ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 123);
+        context = getApplicationContext();
 
         lblStatus = findViewById(R.id.lblStatus);
         txtDisplayName = findViewById(R.id.txtDisplayName);
         txtDistance = findViewById(R.id.txtDistance);
         svgArrow = findViewById(R.id.svgArrow);
         fabExplore = findViewById(R.id.fabExplore);
-
-        lblStatus.setText("Getting your location...");
         txtDisplayName.setText("");
         fabExplore.setEnabled(false);
 
+        String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION};
+
+        if (ContextCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_DENIED)
+            ActivityCompat.requestPermissions(MainActivity.this, permissions, 123);
+        else
+            fimmeInit();
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults)
+    {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+            fimmeInit();
+        else
+            lblStatus.setText("Location permission denied");
+    }
+
+    private void fimmeInit()
+    {
         compass = new Compass(context);
         tracker = new LocationTracker(context);
         tracker.setListener(new LocationTracker.CustomLocationListener()
@@ -77,6 +98,7 @@ public class MainActivity extends AppCompatActivity
                 myLocation = location;
             }
         });
+        lblStatus.setText("Getting your location...");
     }
 
     @Override
