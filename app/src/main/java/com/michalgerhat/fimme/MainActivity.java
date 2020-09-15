@@ -1,6 +1,5 @@
 package com.michalgerhat.fimme;
 
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -69,6 +68,8 @@ public class MainActivity extends AppCompatActivity
 
     private void fimmeInit()
     {
+        lblStatus.setText("Getting your location...");
+
         compass = new Compass(context);
         tracker = new LocationTracker(context);
         tracker.setListener(new LocationTracker.CustomLocationListener()
@@ -78,27 +79,27 @@ public class MainActivity extends AppCompatActivity
             {
                 if (myLocation == null)
                 {
-                    lblStatus.setText("Ready to track");
                     fabExplore.setEnabled(true);
                     fabExplore.show();
-
-                    fabExplore.setOnClickListener(new View.OnClickListener()
-                    {
-                        @Override
-                        public void onClick(View v)
-                        {
-                            Intent intent = new Intent(MainActivity.this, PlacesActivity.class);
-                            Bundle locationBundle = new Bundle();
-                            locationBundle.putSerializable("MY_LOCATION", myLocation);
-                            intent.putExtras(locationBundle);
-                            startActivityForResult(intent, SELECT_PLACE);
-                        }
-                    });
                 }
+                else
+                    System.out.println(myLocation.toString());
                 myLocation = location;
+
+                fabExplore.setOnClickListener(new View.OnClickListener()
+                {
+                    @Override
+                    public void onClick(View v)
+                    {
+                        Intent intent = new Intent(MainActivity.this, PlacesActivity.class);
+                        Bundle locationBundle = new Bundle();
+                        locationBundle.putSerializable("MY_LOCATION", myLocation);
+                        intent.putExtras(locationBundle);
+                        startActivityForResult(intent, SELECT_PLACE);
+                    }
+                });
             }
         });
-        lblStatus.setText("Getting your location...");
     }
 
     @Override

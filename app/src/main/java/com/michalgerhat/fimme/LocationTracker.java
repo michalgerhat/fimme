@@ -7,6 +7,8 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.widget.Toast;
 import androidx.core.content.ContextCompat;
 
@@ -51,7 +53,23 @@ public class LocationTracker implements LocationListener
         }
         else
         {
-            lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+            Location lastKnown = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            if (lastKnown == null)
+                lastKnown = lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+            if (lastKnown != null)
+            {
+                final Location tmpLoc = lastKnown;
+                final Handler handler = new Handler(Looper.getMainLooper());
+                handler.postDelayed(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        onLocationChanged(tmpLoc);
+                    }
+                }, 100);
+            }
+
             Criteria criteria = new Criteria();
             criteria.setAccuracy(Criteria.ACCURACY_FINE);
             criteria.setPowerRequirement(Criteria.POWER_HIGH);
