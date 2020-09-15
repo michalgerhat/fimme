@@ -15,14 +15,21 @@ import java.util.Iterator;
 
 class PlacesManager
 {
+    private Context context;
     private static final String filename = "places.json";
     ArrayList<LocationObject> placesArray;
-    private Context context;
 
     PlacesManager(Context context)
     {
         this.context = context;
         this.placesArray = parsePlaces();
+        if (this.placesArray.size() == 0)
+        {
+            addPlace(new LocationObject("Church of Saint Wenceslas", 50.073379, 14.404309, 195));
+            addPlace(new LocationObject("Petřín Tower", 50.083521, 14.395085, 324));
+            addPlace(new LocationObject("Prague Metronome", 50.0094715, 14.415952, 236));
+            addPlace(new LocationObject("National Museum of Prague", 50.079311, 14.430392, 216));
+        }
     }
 
     private String loadPlaces()
@@ -147,9 +154,19 @@ class PlacesManager
         Intent sendIntent = new Intent();
         sendIntent.setAction(Intent.ACTION_SEND);
         sendIntent.setType("text/plain");
-        sendIntent.putExtra(Intent.EXTRA_TEXT, "http://fimme/location?name=" + place.displayName +
+        sendIntent.putExtra(Intent.EXTRA_TEXT, "http://fimme/location?name=" + replaceWhitespaces(place.displayName, 1) +
                 "&lat=" + place.lat + "&lon=" + place.lon + "&alt=" + place.alt);
         Intent shareIntent = Intent.createChooser(sendIntent, "Share location");
         context.startActivity(shareIntent);
+    }
+
+    String replaceWhitespaces(String text, int mode)
+    {
+        if (mode == 1)
+            return text.replace(' ', '_');
+        else if (mode == -1)
+            return text.replace('_', ' ');
+        else
+            return text;
     }
 }

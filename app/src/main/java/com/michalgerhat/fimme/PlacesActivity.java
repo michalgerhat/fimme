@@ -42,12 +42,13 @@ public class PlacesActivity extends AppCompatActivity
         placesManager = new PlacesManager(this);
 
         if (Intent.ACTION_VIEW.equals(intentAction) && intentData != null) {
-            LocationObject newObject = new LocationObject(intentData.getQueryParameter("name"),
-                    Double.parseDouble(intentData.getQueryParameter("lat")),
-                    Double.parseDouble(intentData.getQueryParameter("lon")),
-                    Double.parseDouble(intentData.getQueryParameter("alt")));
+            String newName = placesManager.replaceWhitespaces(intentData.getQueryParameter("name"), -1);
+            Double newLat = Double.parseDouble(intentData.getQueryParameter("lat"));
+            Double newLon = Double.parseDouble(intentData.getQueryParameter("lon"));
+            Double newAlt = Double.parseDouble(intentData.getQueryParameter("alt"));
+            LocationObject newObject = new LocationObject(newName, newLat, newLon, newAlt);
             placesManager.addPlace(newObject);
-            Toast.makeText(this, intentData.getQueryParameter("name") + " added", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, newName + " added", Toast.LENGTH_LONG).show();
         }
 
         listPlaces = findViewById(R.id.listPlaces);
