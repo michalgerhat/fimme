@@ -1,9 +1,12 @@
 package com.michalgerhat.fimme;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +14,8 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
+
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.Locale;
 
@@ -27,10 +32,23 @@ public class PlacesActivity extends AppCompatActivity
         setContentView(R.layout.activity_places);
 
         Intent intent = this.getIntent();
+        String intentAction = intent.getAction();
+        Uri intentData = intent.getData();
         Bundle locationBundle = intent.getExtras();
-        myLocation = (LocationObject) locationBundle.getSerializable("MY_LOCATION");
+        if (locationBundle != null)
+            myLocation = (LocationObject) locationBundle.getSerializable("MY_LOCATION");
+        else myLocation = new LocationObject("tmp", 50, 50, 100);
 
         placesManager = new PlacesManager(this);
+
+        if (Intent.ACTION_VIEW.equals(intentAction) && intentData != null) {
+            LocationObject newObject = new LocationObject(intentData.getQueryParameter("name"),
+                    Double.parseDouble(intentData.getQueryParameter("lat")),
+                    Double.parseDouble(intentData.getQueryParameter("lon")),
+                    Double.parseDouble(intentData.getQueryParameter("alt")));
+            placesManager.addPlace(newObject);
+            Toast.makeText(this, intentData.getQueryParameter("name") + " added", Toast.LENGTH_LONG).show();
+        }
 
         listPlaces = findViewById(R.id.listPlaces);
         FloatingActionButton fabAddPlace = findViewById(R.id.fabAddPlace);
@@ -43,6 +61,14 @@ public class PlacesActivity extends AppCompatActivity
             {
                 placesManager.removePlace(place);
                 adapter.notifyDataSetChanged();
+            }
+        });
+        adapter.setShareButtonListener(new PlacesAdapter.IShareButtonListener()
+        {
+            @Override
+            public void OnButtonClickListener(int position, LocationObject place)
+            {
+                placesManager.sharePlace(place);
             }
         });
         listPlaces.setAdapter(adapter);
@@ -118,5 +144,16 @@ public class PlacesActivity extends AppCompatActivity
                 });
             }
         });
+
+        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                Intent i = new Intent(PlacesActivity.this, MainActivity.class);
+                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(i);
+                finish();
+            }
+        };
+        this.getOnBackPressedDispatcher().addCallback(this, callback);
     }
 }

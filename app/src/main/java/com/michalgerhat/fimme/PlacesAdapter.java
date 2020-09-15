@@ -18,9 +18,15 @@ public class PlacesAdapter extends BaseAdapter
         void OnButtonClickListener(int position, LocationObject place);
     }
 
+    public interface IShareButtonListener
+    {
+        void OnButtonClickListener(int position, LocationObject place);
+    }
+
     private ArrayList<LocationObject> data;
     private static LayoutInflater inflater = null;
     private IDeleteButtonListener deleteButtonListener;
+    private IShareButtonListener shareButtonListener;
 
     PlacesAdapter (Context context, ArrayList<LocationObject> data)
     {
@@ -55,11 +61,24 @@ public class PlacesAdapter extends BaseAdapter
             }
         });
 
+        ImageView shareButton = (ImageView)v.findViewById(R.id.place_share);
+        shareButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                shareButtonListener.OnButtonClickListener(position, data.get(position));
+            }
+        });
+
         return v;
     }
 
     void setDeleteButtonListener(IDeleteButtonListener listener)
     {
         this.deleteButtonListener = listener;
+    }
+
+    void setShareButtonListener(IShareButtonListener listener)
+    {
+        this.shareButtonListener = listener;
     }
 }

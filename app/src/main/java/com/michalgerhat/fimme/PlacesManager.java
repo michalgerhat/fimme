@@ -1,6 +1,8 @@
 package com.michalgerhat.fimme;
 
 import android.content.Context;
+import android.content.Intent;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -137,5 +139,17 @@ class PlacesManager
                 it.remove();
         }
         savePlaces();
+    }
+
+    void sharePlace(LocationObject place)
+    {
+        System.out.println("sharing place");
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.setType("text/plain");
+        sendIntent.putExtra(Intent.EXTRA_TEXT, "http://fimme/location?name=" + place.displayName +
+                "&lat=" + place.lat + "&lon=" + place.lon + "&alt=" + place.alt);
+        Intent shareIntent = Intent.createChooser(sendIntent, "Share location");
+        context.startActivity(shareIntent);
     }
 }

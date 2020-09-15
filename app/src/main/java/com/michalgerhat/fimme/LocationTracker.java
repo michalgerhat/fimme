@@ -57,6 +57,7 @@ public class LocationTracker implements LocationListener
             criteria.setAccuracy(Criteria.ACCURACY_FINE);
             criteria.setPowerRequirement(Criteria.POWER_HIGH);
             String provider = lm.getBestProvider(criteria, true);
+            lm.getLastKnownLocation(provider);
             lm.requestLocationUpdates(provider, 2000, 2, this);
         }
     }
